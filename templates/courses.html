@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Available Courses</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Course Catalog</h2>
+
+  <!-- Filter Form -->
+  <form method="get" action="/course/courses">
+    <label for="type">Filter by Category:</label>
+    <select name="type" id="type">
+      <option value="">All</option>
+      <option value="technical" {% if selected_type == 'technical' %}selected{% endif %}>Technical</option>
+      <option value="general" {% if selected_type == 'general' %}selected{% endif %}>General</option>
+      <option value="certificate" {% if selected_type == 'certificate' %}selected{% endif %}>Certificate</option>
+      <option value="quality" {% if selected_type == 'quality' %}selected{% endif %}>Quality</option>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  <!-- Course List -->
+  {% if courses %}
+    {% for course in courses %}
+      <div class="course">
+        <h3>{{ course.name }}</h3>
+        <p><strong>ID:</strong> {{ course.course_id }}</p>
+        <p><strong>Duration:</strong> {{ course.duration }}</p>
+        <p><strong>Provider:</strong> {{ course.training_provider }}</p>
+        <p><strong>Applicable Levels:</strong> {{ course.applicable_levels }}</p>
+        <p><strong>Description:</strong> {{ course.description }}</p>
+        <p><strong>Type:</strong> {{ course.course_type }}</p>
+
+        {% if session.role == 'manager' %}
+          <form method="post" action="/course/delete_course/{{ course.course_id }}">
+            <label for="password">Enter your password to confirm deletion:</label><br>
+            <input type="password" name="password" id="password" required><br><br>
+            <button type="submit">Confirm Delete</button>
+          </form>
+        {% elif session.role == 'user' %}
+          <form method="post" action="/selection/select_course/{{ course.course_id }}">
+            <button type="submit">Select Course</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No courses found for selected category.</p>
+  {% endif %}
+</body>
+</html>

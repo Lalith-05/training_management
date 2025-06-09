@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Welcome, {{ username }}!</h2>
+  <p>You are logged in as <strong>{{ role.upper() }}</strong>.</p>
+
+  <div class="dashboard-links">
+    <ul>
+      <li><a href="/course/courses">View Available Courses</a></li>
+
+      {% if role == 'user' %}
+        <li><a href="/dashboard/my_courses">My Selected Courses</a></li>
+        <li><a href="/feedback">Give Feedback</a></li>
+      {% elif role == 'manager' %}
+        <li><a href="/course/add_course">Add New Course</a></li>
+        <li><a href="{{ url_for('selection_bp.approve_courses') }}">Approve Course Selections</a></li>
+        <li><a href="/feedbacks">View Feedback</a></li>
+      {% endif %}
+      
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </div>
+</body>
+</html>
+

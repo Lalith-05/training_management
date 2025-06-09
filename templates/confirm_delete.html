@@ -1,0 +1,18 @@
+<!-- templates/confirm_delete.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Delete</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Confirm Deletion</h2>
+  <p>Enter your password to confirm deletion of course ID {{ course_id }}.</p>
+  <form method="post">
+    <input type="password" name="password" required>
+    <button type="submit">Confirm Delete</button>
+  </form>
+  <a href="/courses">Cancel</a>
+</body>
+</html>

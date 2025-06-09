@@ -1,0 +1,42 @@
+<!-- templates/approve_courses.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Approve Course Requests</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Pending Course Approvals</h2>
+  {% if selections %}
+    {% for req in selections %}
+      <div class="request-box">
+        <p><strong>User:</strong> {{ req.username }} ({{ req.email }})</p>
+        <p><strong>Designation:</strong> {{ req.designation }}</p>
+        <p><strong>Course:</strong> {{ req.course_name }} [{{ req.course_type }}] (ID: {{ req.course_id }})</p>
+
+        <!-- ✅ Fixed form action -->
+        <form method="post" action="{{ url_for('selection_bp.handle_request', request_id=req.id) }}">
+          <button name="action" value="approve">Approve</button>
+          <button name="action" value="reject" onclick="return confirmReject(this.form)">Reject</button>
+          <br><br>
+          <textarea name="reason" placeholder="Reason if rejected..."></textarea>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No pending requests.</p>
+  {% endif %}
+
+  <script>
+    function confirmReject(form) {
+      const reason = form.reason.value.trim();
+      if (!reason) {
+        alert('Please enter a reason for rejection.');
+        return false;
+      }
+      return true;
+    }
+  </script>
+</body>
+</html>

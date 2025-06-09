@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Registration</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script defer src="C:\Users\mohan\Desktop\trainingbel\static\js\validate.js"></script>
+</head>
+<body>
+  <h2>Register New Account</h2>
+  <form action="/register" method="POST" id="registerForm">
+    <label>Username (8-15 chars):</label>
+    <input type="text" name="username" required minlength="8" maxlength="15">
+
+    <label>Staff Number:</label>
+    <input type="text" name="staff_no" required>
+
+    <label>Email:</label>
+    <input type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+
+    <label>Department:</label>
+    <input type="text" name="department" required>
+
+    <label>Designation:</label>
+    <select name="designation" required>
+      <option value="">Select</option>
+      <option value="E1">E1</option>
+      <option value="E2">E2</option>
+      <option value="E3">E3</option>
+      <option value="E4">E4</option>
+      <option value="E5">E5</option>
+      <option value="E6">E6</option>
+      <option value="E7">E7</option>
+      <option value="E8">E8</option>
+      <option value="E9">E9</option>
+      <option value="E10">E10</option>
+      <option value="E11">E11</option>
+    </select>
+
+    <label>Password (min 8 chars, 1 upper, 1 lower, 1 number):</label>
+    <input type="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+
+    <label>Confirm Password:</label>
+    <input type="password" name="confirm_password" required>
+
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="/login">Login here</a></p>
+</body>
+</html>

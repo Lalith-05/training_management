@@ -1,0 +1,26 @@
+<!-- templates/my_courses.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Courses</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>My Selected Courses</h2>
+  {% if my_courses %}
+    {% for course in my_courses %}
+      <div class="course-box">
+        <h3>{{ course.name }}</h3>
+        <p><strong>ID:</strong> {{ course.course_id }}</p>
+        <p><strong>Type:</strong> {{ course.course_type }}</p>
+        <p><strong>Status:</strong> {{ course.status }}</p>
+        <p><strong>Reason (if rejected):</strong> {{ course.reason or 'N/A' }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>You haven't selected any courses yet.</p>
+  {% endif %}
+  <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

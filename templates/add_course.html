@@ -1,0 +1,42 @@
+<!-- templates/add_course.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Course</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Add a New Course</h2>
+
+  <!-- Updated form action URL -->
+  <form method="POST" action="/course/add_course">
+    <label>Name:</label>
+    <input type="text" name="name" required><br>
+
+    <label>Duration:</label>
+    <input type="text" name="duration" required><br>
+
+    <label>Training Provider:</label>
+    <input type="text" name="provider" required><br>
+
+    <label>Applicable Levels:</label>
+    <input type="text" name="levels" placeholder="E1,E2,E3" required><br>
+
+    <label>Description:</label>
+    <textarea name="description" required></textarea><br>
+
+    <label>Course Type:</label>
+    <select name="course_type" required>
+      <option value="technical">Technical</option>
+      <option value="general">General</option>
+      <option value="certificate">Certificate</option>
+      <option value="quality">Quality</option>
+    </select><br><br>
+
+    <button type="submit">Add Course</button>
+  </form>
+
+  <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>
