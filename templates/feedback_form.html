@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Feedback</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+    form {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+    <h2>Submit Course Feedback</h2>
+    <form method="POST">
+        <h3>User Information</h3>
+        <p>Name: {{ user.username }}</p>
+        <p>Staff No: {{ user.staff_no }}</p>
+        <p>Designation: {{ user.designation }}</p>
+        <p>Department: {{ user.department }}</p>
+
+        <h3>Course Details</h3>
+        <p>Course: {{ course.name }}</p>
+        <p>Type: {{ course.course_type }}</p>
+
+        <label>Trainer Name:</label>
+        <input type="text" name="trainer_name" required>
+
+        <label>Date of Training:</label>
+        <input type="date" name="training_date" required>
+
+        <label>Was the course helpful?</label>
+        <input type="radio" name="course_helpful" value="yes" required> Yes
+        <input type="radio" name="course_helpful" value="no"> No
+
+        <label>Course Rating (1-5):</label>
+        <input type="number" name="course_rating" min="1" max="5" required>
+
+        <label>Trainer Rating (1-5):</label>
+        <input type="number" name="trainer_rating" min="1" max="5" required>
+
+        <label>Feedback on Course:</label>
+        <textarea name="course_review" rows="4" required></textarea>
+
+        <label>Feedback on Trainer:</label>
+        <textarea name="trainer_review" rows="4" required></textarea>
+
+        <label>Concepts You Understood:</label>
+        <textarea name="understood_concepts" rows="3" required></textarea>
+
+        <label>Suggestions for Improvement:</label>
+        <textarea name="improvements" rows="3" required></textarea>
+
+        <button type="submit">Submit Feedback</button>
+    </form>
+</body>
+</html>

@@ -4,18 +4,114 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+    }
+
+    nav {
+      background-color: #0077b6;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+
+    nav .nav-title {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 90vh;
+    }
+
+    .login-form {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #eaf2ff;
+    }
+
+    .login-form button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #0077b6;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .login-form button:hover {
+      background-color: #005b8a;
+    }
+
+    .login-form p {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .login-form a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+
+    .login-form a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <h2>User Login</h2>
-  <form action="/login" method="POST">
-    <label>Staff Number:</label>
-    <input type="text" name="staff_no" required>
 
-    <label>Password:</label>
-    <input type="password" name="password" required>
+  <!-- Top Navigation Bar -->
+  <nav>
+    <div class="nav-title">Training Management System</div>
+    <!-- Optional nav links -->
+    <!-- <div><a href="/home" style="color:white;">Home</a></div> -->
+  </nav>
 
-    <button type="submit">Login</button>
-  </form>
-  <p>Don't have an account? <a href="/register">Register here</a></p>
+  <!-- Login Form Section -->
+  <div class="container">
+    <form class="login-form" action="/login" method="POST">
+      <h2 style="text-align: center; margin-bottom: 20px;">User Login</h2>
+
+      <label for="staff_no">Staff Number:</label>
+      <input type="text" id="staff_no" name="staff_no" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Login</button>
+
+      <p>Don't have an account? <a href="/register">Register here</a></p>
+    </form>
+  </div>
+
 </body>
 </html>

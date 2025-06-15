@@ -1,0 +1,53 @@
+<!-- templates/delete_course_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Courses</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .course-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 15px auto;
+      max-width: 600px;
+      border-radius: 10px;
+      background-color: #fff7f7;
+    }
+
+    .course-box h4 {
+      margin: 5px 0;
+    }
+
+    form {
+      display: inline;
+    }
+
+    button {
+      padding: 5px 10px;
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #c9302c;
+    }
+  </style>
+</head>
+<body>
+  <h2>Delete Courses</h2>
+  {% for course in courses %}
+    <div class="course-box">
+      <h4>{{ course.course_name }} ({{ course.course_id }})</h4>
+      <p><strong>Duration:</strong> {{ course.duration }} | <strong>Provider:</strong> {{ course.training_provider }}</p>
+      <form method="post" action="{{ url_for('course.delete_specific_course', course_id=course.course_id) }}">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this course?')">Delete</button>
+      </form>
+    </div>
+  {% endfor %}
+  <br>
+  <a href="/dashboard">← Back to Dashboard</a>
+</body>
+</html>

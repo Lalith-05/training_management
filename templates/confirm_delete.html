@@ -3,16 +3,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Confirm Delete</title>
+  <title>Confirm Course Deletion</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .delete-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 25px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #fff3f3;
+      text-align: center;
+    }
+
+    h2 {
+      color: #d9534f;
+    }
+
+    label, input[type="password"] {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    input[type="password"] {
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c9302c;
+    }
+
+    .cancel-link {
+      display: inline-block;
+      margin-top: 15px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .cancel-link:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <h2>Confirm Deletion</h2>
-  <p>Enter your password to confirm deletion of course ID {{ course_id }}.</p>
-  <form method="post">
-    <input type="password" name="password" required>
-    <button type="submit">Confirm Delete</button>
-  </form>
-  <a href="/courses">Cancel</a>
+  <div class="delete-container">
+    <h2>Confirm Deletion</h2>
+    <p>Please enter your password to delete course with ID <strong>{{ course_id }}</strong>.</p>
+    <form method="post">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">Confirm Delete</button>
+    </form>
+    <a href="/course/courses" class="cancel-link">Cancel</a>
+  </div>
 </body>
 </html>

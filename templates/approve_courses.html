@@ -5,29 +5,53 @@
   <meta charset="UTF-8">
   <title>Approve Course Requests</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .request-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    .request-box.rejected {
+      background-color: #ffe6e6;
+      border-left: 5px solid red;
+    }
+    textarea {
+      width: 100%;
+      margin-top: 10px;
+    }
+    button {
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
   <h2>Pending Course Approvals</h2>
+
   {% if selections %}
     {% for req in selections %}
       <div class="request-box">
         <p><strong>User:</strong> {{ req.username }} ({{ req.email }})</p>
         <p><strong>Designation:</strong> {{ req.designation }}</p>
         <p><strong>Course:</strong> {{ req.course_name }} [{{ req.course_type }}] (ID: {{ req.course_id }})</p>
+        <p><strong>Duration:</strong> {{ req.duration }}</p>
+        <p><strong>Description:</strong> {{ req.description }}</p>
 
-        <!-- ✅ Fixed form action -->
-        <form method="post" action="{{ url_for('selection_bp.handle_request', request_id=req.id) }}">
-          <button name="action" value="approve">Approve</button>
-          <button name="action" value="reject" onclick="return confirmReject(this.form)">Reject</button>
+        <form method="post" action="{{ url_for('selection.handle_request', request_id=req.id) }}">
+          <button type="submit" name="action" value="approve">Approve</button>
+          <button type="submit" name="action" value="reject" onclick="return confirmReject(this.form)">Reject</button>
           <br><br>
-          <textarea name="reason" placeholder="Reason if rejected..."></textarea>
+          <textarea name="reason" placeholder="Reason if rejected..." rows="2"></textarea>
         </form>
       </div>
+      <hr>
     {% endfor %}
   {% else %}
     <p>No pending requests.</p>
   {% endif %}
-
+  <br>
+  <a href="/dashboard">← Back to Dashboard</a>
   <script>
     function confirmReject(form) {
       const reason = form.reason.value.trim();
@@ -37,6 +61,40 @@
       }
       return true;
     }
+
+    function handleSubmit(form) {
+      const buttons = form.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+      return true;
+    }
   </script>
+  <script>
+  // Inject hidden input for which button was clicked (approve or reject)
+  document.querySelectorAll("form").forEach(form => {
+    form.querySelectorAll("button").forEach(button => {
+      button.addEventListener("click", function () {
+        let hiddenInput = form.querySelector("input[name='action']");
+        if (!hiddenInput) {
+          hiddenInput = document.createElement("input");
+          hiddenInput.type = "hidden";
+          hiddenInput.name = "action";
+          form.appendChild(hiddenInput);
+        }
+        hiddenInput.value = this.value;
+      });
+    });
+  });
+
+  // Confirm rejection reason is filled
+  function confirmReject(form) {
+    const reason = form.reason.value.trim();
+    if (!reason) {
+      alert('Please enter a reason for rejection.');
+      return false;
+    }
+    return true;
+  }
+</script>
+
 </body>
 </html>

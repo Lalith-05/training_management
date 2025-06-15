@@ -5,22 +5,134 @@
   <meta charset="UTF-8">
   <title>My Courses</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .course-container {
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    .course-box {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .course-box h3 {
+      margin-top: 0;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .status.approved {
+      color: green;
+      background-color: #e6f5ea;
+    }
+
+    .status.pending {
+      color: #f0ad4e;
+      background-color: #fff8e6;
+    }
+
+    .status.rejected {
+      color: red;
+      background-color: #ffe6e6;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .feedback-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .feedback-link:hover {
+      text-decoration: underline;
+    }
+
+    .feedback-submitted {
+      margin-top: 10px;
+      font-style: italic;
+      color: #666;
+    }
+
+    .manager-review {
+      margin-top: 5px;
+      padding: 10px;
+      background-color: #eef;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h2>My Selected Courses</h2>
-  {% if my_courses %}
-    {% for course in my_courses %}
-      <div class="course-box">
-        <h3>{{ course.name }}</h3>
-        <p><strong>ID:</strong> {{ course.course_id }}</p>
-        <p><strong>Type:</strong> {{ course.course_type }}</p>
-        <p><strong>Status:</strong> {{ course.status }}</p>
-        <p><strong>Reason (if rejected):</strong> {{ course.reason or 'N/A' }}</p>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>You haven't selected any courses yet.</p>
-  {% endif %}
-  <a href="/dashboard">Back to Dashboard</a>
+  <div class="course-container">
+    <h2>My Selected Courses</h2>
+
+    {% if my_courses %}
+      {% for course in my_courses %}
+        <div class="course-box">
+          <h3>{{ course.name }}</h3>
+          <p><strong>ID:</strong> {{ course.course_id }}</p>
+          <p><strong>Type:</strong> {{ course.course_type }}</p>
+          <p>
+            <strong>Status:</strong>
+            <span class="status {{ course.status }}">
+              {{ course.status.capitalize() }}
+            </span>
+          </p>
+
+          {% if course.status == 'rejected' %}
+            <p><strong>Rejection Reason:</strong> {{ course.reason }}</p>
+
+          {% elif course.status == 'approved' %}
+            {% if course.feedback_submitted %}
+              <p class="feedback-submitted">✅ Feedback submitted.</p>
+              
+              {% if course.manager_comments %}
+                <div class="manager-review">
+                  <p><strong>Manager Comments:</strong> {{ course.manager_comments }}</p>
+                  <p><strong>Allowed to Continue:</strong> 
+                    {% if course.allow_to_continue %}
+                      {{ course.allow_to_continue | capitalize }}
+                    {% else %}
+                      Pending
+                    {% endif %}
+                  </p>
+                </div>
+              {% else %}
+                <p class="feedback-submitted">⏳ Awaiting manager review.</p>
+              {% endif %}
+            {% else %}
+              <a class="feedback-link" href="{{ url_for('feedback.submit_feedback', course_id=course.course_id) }}">
+                Give Feedback
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>You haven't selected any courses yet.</p>
+    {% endif %}
+
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+  </div>
 </body>
 </html>

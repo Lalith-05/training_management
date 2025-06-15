@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Feedbacks</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .feedback-box {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Feedback from Assigned Users</h2>
+
+  {% if feedbacks %}
+    {% for fb in feedbacks %}
+      <div class="feedback-box">
+        <h3>{{ fb.course_name }} ({{ fb.course_id }})</h3>
+        <p><strong>User:</strong> {{ fb.username }} | 
+           <strong>Staff No:</strong> {{ fb.staff_no }} | 
+           <strong>Designation:</strong> {{ fb.designation }}</p>
+
+        <p><strong>Training Date:</strong> {{ fb.training_date.strftime('%Y-%m-%d') if fb.training_date else 'N/A' }}</p>
+        <p><strong>Was Course Helpful?:</strong> {{ fb.course_helpful }}</p>
+        <p><strong>Course Rating:</strong> {{ fb.course_rating }}/5</p>
+        <p><strong>Trainer Name:</strong> {{ fb.trainer_name }}</p>
+        <p><strong>Trainer Rating:</strong> {{ fb.trainer_rating }}/5</p>
+        <p><strong>Submitted On:</strong> {{ fb.submitted_at.strftime("%Y-%m-%d %H:%M") }}</p>
+
+        <form action="{{ url_for('feedback.update_feedback', feedback_id=fb.id) }}" method="POST">
+          <label><strong>Manager Comments:</strong></label><br>
+          <textarea name="manager_comments">{{ fb.manager_comments or '' }}</textarea><br><br>
+
+          <label><strong>Allow to Continue Course?</strong></label><br>
+          <select name="allow_to_continue" required>
+            <option value="">-- Select --</option>
+            <option value="yes" {% if fb.allow_to_continue == 'yes' %}selected{% endif %}>Yes</option>
+            <option value="no" {% if fb.allow_to_continue == 'no' %}selected{% endif %}>No</option>
+          </select><br><br>
+
+          <button type="submit">Update Feedback</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No feedbacks submitted by your users yet.</p>
+  {% endif %}
+
+  <a href="/dashboard">← Back to Dashboard</a>
+</body>
+</html>

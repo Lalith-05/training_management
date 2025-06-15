@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reassign User to Manager</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h2>Admin: Reassign User to a Different Manager</h2>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="/admin/reassign_user">
+    <label for="user_id">Select User:</label>
+    <select name="user_id" required>
+      <option value="">-- Select a User --</option>
+      {% for user in users %}
+        <option value="{{ user.id }}">{{ user.username }} (ID: {{ user.id }})</option>
+      {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label for="manager_id">Select New Manager:</label>
+    <select name="manager_id" required>
+      <option value="">-- Select a Manager --</option>
+      {% for manager in managers %}
+        <option value="{{ manager.id }}">{{ manager.username }} (ID: {{ manager.id }})</option>
+      {% endfor %}
+    </select>
+
+    <br><br>
+
+    <button type="submit">Reassign User</button>
+  </form>
+
+  <br>
+  <a href="/dashboard">← Back to Dashboard</a>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,20 +11,28 @@
 
   <div class="dashboard-links">
     <ul>
-      <li><a href="/course/courses">View Available Courses</a></li>
+      <!-- All roles -->
+      <li><a href="/course/view_courses">View Available Courses</a></li>
 
       {% if role == 'user' %}
         <li><a href="/dashboard/my_courses">My Selected Courses</a></li>
-        <li><a href="/feedback">Give Feedback</a></li>
+        
+
+
       {% elif role == 'manager' %}
+        <li><a href="{{ url_for('selection.approve_courses') }}">Approve Course Selections</a></li>
+        <li><a href="{{ url_for('feedback.view_feedbacks') }}">View Submitted Feedbacks</a></li>
+
+
+      {% elif role == 'admin' %}
         <li><a href="/course/add_course">Add New Course</a></li>
-        <li><a href="{{ url_for('selection_bp.approve_courses') }}">Approve Course Selections</a></li>
-        <li><a href="/feedbacks">View Feedback</a></li>
+        <li><a href="/admin/delete_course">Delete Course</a></li>
+        <li><a href="/admin/user_manager_map">View Users by Manager</a></li>
+        <li><a href="/admin/reassign_user">Reassign User to Another Manager</a></li>
       {% endif %}
-      
+
       <li><a href="/logout">Logout</a></li>
     </ul>
   </div>
 </body>
 </html>
-

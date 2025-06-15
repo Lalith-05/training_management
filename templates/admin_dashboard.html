@@ -1,0 +1,24 @@
+<!-- templates/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+</head>
+<body>
+    <h2>Welcome, Admin {{ username }}</h2>
+
+    <ul>
+        <li><a href="/admin/user_manager_map">User-Manager Mapping</a></li>
+        <li><a href="/admin/reassign_user">Reassign Users</a></li>
+        <li><a href="/course/add_course">Add Course</a></li>
+        <li><a href="/course/view_courses">View All Courses</a></li>
+        <li><a href="/course/delete_course">Delete Courses</li>
+
+    </ul>
+
+    <a href="/logout">Logout</a>
+</body>
+</html>
