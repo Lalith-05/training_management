@@ -1,17 +1,26 @@
-DROP TABLE IF EXISTS `feedback`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `feedback` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int DEFAULT NULL,
   `course_id` int DEFAULT NULL,
-  `rating` int DEFAULT NULL,
-  `comments` text,
+  `trainer_name` varchar(100) DEFAULT NULL,
+  `training_date` date DEFAULT NULL,
+  `course_helpful` tinyint(1) DEFAULT NULL,
+  `course_rating` int DEFAULT NULL,
+  `trainer_rating` int DEFAULT NULL,
+  `course_review` text,
+  `trainer_review` text,
+  `manager_id` int DEFAULT NULL,
+  `manager_comments` text,
+  `allow_to_continue` enum('yes','no') DEFAULT NULL,
+  `submitted_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `manager_reviewed` tinyint(1) DEFAULT '0',
+  `understood_concepts` text,
+  `improvements` text,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
+  KEY `manager_id` (`manager_id`),
   KEY `course_id` (`course_id`),
   CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+  CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`manager_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `feedback_ibfk_3` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
