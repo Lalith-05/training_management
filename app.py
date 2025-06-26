@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask , render_template
 from routes.auth_routes import auth_bp
 from routes.dashboard_routes import dashboard_bp
 from routes.selection_routes import selection_bp
@@ -18,7 +18,6 @@ app.register_blueprint(feedback_bp, url_prefix='/feedback')
 
 @app.route('/')
 def home():
-    return "<h3>Welcome to Training Management System</h3><p><a href='/login'>Login</a> or <a href='/register'>Register</a></p>"
-
+    return render_template('home.html')
 if __name__ == '__main__':
     app.run(debug=True)

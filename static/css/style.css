@@ -39,10 +39,18 @@ body {
     margin-left: auto;
     margin-right: auto;
     display: flex;
-    justify-content: center; /* Center the title */
+    justify-content: space-between; /* Space between title and links */
     align-items: center;
+    flex-wrap: wrap; /* Allow wr
+    apping on small screens */
 }
 
+.nav-left {
+    flex-basis: 0; /* Ensures it takes minimal space initially */
+    flex-grow: 1; /* Allows it to grow and push the title towards the center */
+    max-width: 30%; /* Limits its size to prevent the title from being too squished */
+    min-width: 50px; /* Minimum width for small screens, ensures it exists */
+}
 .nav-title {
     font-size: 30px; /* text-3xl */
     font-weight: 800; /* font-extrabold */
@@ -50,12 +58,43 @@ body {
     white-space: nowrap; /* Prevent wrapping on small screens */
     overflow: hidden;
     text-overflow: ellipsis; /* Add ellipsis if text is too long */
+    margin-right: 20px; /* Space between title and nav-links */
+   flex-grow: 2; /* This is the most important change: it makes the title grow twice as much as `nav-left` and `nav-links`, ensuring it occupies the dominant center space. */
+    text-align: center; /* This centers the text *within* the title's allocated space. */
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap; /* Allow links to wrap */
+    justify-content: flex-end; /* Align links to the right */
+    flex-basis: 0; /* Ensures it takes minimal space initially */
+    flex-grow: 1; /* Allows it to grow and balance `nav-left` */
+    max-width: 30%; /* Limits its size */
+    min-width: 50px; /* Minimum width */   
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white on hover */
 }
 
 /* Main Content Area Styles (for centering the form) */
 .main-content {
     flex-grow: 1; /* flex-grow */
     display: flex;
+    flex-direction: column; /* Allow content sections to stack */
     justify-content: center;
     align-items: center;
     padding: 16px; /* p-4 */
@@ -81,11 +120,11 @@ body {
 .dashboard-card { /* Used for admin dashboard and user-manager map, and now for course catalog */
     position: relative;
     background-color: white;
-    padding: 32px; /* p-8 */
+    padding: 40px; /* Increased padding for better spacing */
     border-radius: 16px; /* rounded-2xl */
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
     width: 100%;
-    max-width: 900px; /* Wider for dashboard content */
+    max-width: 768px; /* Adjusted max-width for better fit on dashboard pages */
     border-top: 4px solid #4f46e5; /* Consistent top border */
     transition: transform 0.3s ease-in-out;
 }
@@ -228,9 +267,10 @@ body {
 /* Admin/User/Manager Dashboard Specific Styles */
 .dashboard-links {
     display: grid;
-    grid-template-columns: repeat(1, 1fr); /* Default single column */
+    grid-template-columns: repeat(2, 1fr); /* Default single column */
     gap: 24px; /* gap-6 */
     margin-top: 20px;
+    margin-bottom: 60px; /* Added margin to separate from logout button */
     list-style: none; /* Remove bullet points */
     padding: 0;
 }
@@ -259,16 +299,17 @@ body {
     justify-content: center;
     background-color: #f0f8ff; /* Light blue background for link items */
     border: 1px solid #cce7ff; /* Light blue border */
-    padding: 24px;
-    border-radius: 12px;
+    padding: 16px;
+    border-radius: 10px;
     text-decoration: none;
     color: #1e40af; /* Darker blue text */
     font-weight: 600;
-    font-size: 18px;
+    font-size: 16px;
     text-align: center;
     transition: all 0.3s ease-in-out;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     height: 100%; /* Ensure link takes full height of grid item */
+    min-height: 120px;
 }
 
 .dashboard-link-item a:hover {
@@ -280,25 +321,23 @@ body {
 }
 
 .dashboard-link-item a svg { /* Style for SVG icons within dashboard links */
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     margin-bottom: 12px;
     color: #6366f1; /* Indigo color for icons */
     flex-shrink: 0; /* Prevent icon from shrinking */
 }
 
 /* Specific style for Logout button as a full-width item in the grid */
-.dashboard-link-item.full-width {
-    grid-column: 1 / -1; /* Spans all columns */
-}
+/* REMOVED: .dashboard-link-item.full-width { grid-column: 1 / -1; } */
 /* Re-style the actual logout button inside the full-width item */
-.dashboard-link-item.full-width .logout-button {
+.logout-button {
     display: flex; /* Use flex for internal alignment of icon/text */
     flex-direction: column; /* Stack icon and text */
     align-items: center;
     justify-content: center;
-    width: 100%; /* Make it fill its parent */
-    margin: 0; /* Remove auto margins as it's now flex item */
+    width: auto; /* Make it fill its parent */
+    margin: 40px auto 0 auto; /* Center horizontally and add top margin, now on its own */
     background-color: #dc2626; /* Red color for logout */
     color: white;
     font-weight: 600;
@@ -310,25 +349,26 @@ body {
     cursor: pointer;
     text-decoration: none; /* Remove underline for link */
     font-size: 18px; /* Consistent font size */
+    max-width: 200px; /* Constrain width for a better button look */
 }
 
-.dashboard-link-item.full-width .logout-button:hover {
+.logout-button:hover {
     background-color: #b91c1c; /* Darker red on hover */
     transform: translateY(-3px); /* Match other link items */
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1); /* Match other link items */
 }
-.dashboard-link-item.full-width .logout-button:focus {
+.logout-button:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5), 0 0 0 6px rgba(220, 38, 38, 0.2);
 }
-.dashboard-link-item.full-width .logout-button svg {
+.logout-button svg {
     color: white; /* Ensure logout icon is white */
 }
 
 
 /* Logout Button Styles - Reused for "Back to Dashboard" - Adjusted to be generic */
 /* Note: The .logout-button is now also styled specifically when inside .full-width */
-.logout-button, .back-button {
+.back-button {
     display: block; /* Make it a block element to center it */
     margin: 40px auto 0 auto; /* Center horizontally and add top margin */
     width: auto; /* Allow width to adjust to content */
@@ -346,13 +386,13 @@ body {
     cursor: pointer;
 }
 
-.logout-button:hover, .back-button:hover {
+.back-button:hover {
     background-color: #b91c1c; /* Darker red on hover */
     transform: scale(1.01);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.logout-button:focus, .back-button:focus {
+.back-button:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5), 0 0 0 6px rgba(220, 38, 38, 0.2);
 }
@@ -1332,3 +1372,266 @@ body {
     background-color: #1d4ed8;
 }
 
+/* New Home Page Specific Styles */
+.hero-section {
+    background: linear-gradient(to right, #4f46e5, #2563eb); /* Indigo to blue gradient */
+    color: white;
+    text-align: center;
+    padding: 80px 20px; /* Increased padding for more vertical space */
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px; /* Space below hero section */
+}
+
+.hero-section h1 {
+    font-size: 48px; /* Larger heading */
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-section p {
+    font-size: 20px;
+    max-width: 800px;
+    margin: 0 auto 40px auto; /* Centered paragraph with more bottom margin */
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Space between buttons */
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.hero-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.hero-button.primary {
+    background-color: #fff; /* White background */
+    color: #4f46e5; /* Indigo text */
+}
+
+.hero-button.primary:hover {
+    background-color: #e0e7ff; /* Lighter white/blue on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-button.secondary {
+    background-color: transparent; /* Transparent background */
+    color: white;
+    border: 2px solid white; /* White border */
+}
+
+.hero-button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white background on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-button svg {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+/* Features Section */
+.features-section {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.features-section h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 40px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 30px; /* Space between feature cards */
+}
+
+.feature-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%; /* Ensure cards are same height in a row */
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card svg {
+    width: 60px; /* Larger icons */
+    height: 60px;
+    color: #4f46e5; /* Indigo color */
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    font-size: 16px;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* Call to Action Section */
+.cta-section {
+    background-color: #2563eb; /* Strong blue background */
+    color: white;
+    text-align: center;
+    padding: 60px 20px;
+    width: 100%;
+    margin-top: 40px; /* Space above CTA */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cta-section h2 {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.cta-section p {
+    font-size: 20px;
+    max-width: 700px;
+    margin: 0 auto 30px auto;
+    opacity: 0.9;
+}
+
+.cta-button {
+    background-color: #fff; /* White button */
+    color: #2563eb; /* Blue text */
+    padding: 15px 35px;
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+    background-color: #e0e7ff; /* Lighter blue on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #1f2937; /* Dark gray */
+    color: #e0e7ff; /* Light indigo text */
+    text-align: center;
+    padding: 25px 20px;
+    margin-top: auto; /* Push footer to the bottom */
+    font-size: 14px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer p {
+    margin: 0;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 36px;
+    }
+    .hero-section p {
+        font-size: 18px;
+    }
+    .hero-buttons {
+        flex-direction: column; /* Stack buttons vertically on small screens */
+        gap: 15px;
+    }
+    .hero-button {
+        width: 80%; /* Make buttons wider */
+        max-width: 300px; /* Limit max width */
+        margin: 0 auto;
+    }
+    .features-section h2 {
+        font-size: 30px;
+    }
+    .cta-section h2 {
+        font-size: 32px;
+    }
+    .cta-section p {
+        font-size: 18px;
+    }
+    .nav-links {
+        justify-content: center; /* Center nav links if they wrap */
+        margin-top: 10px;
+        width: 100%; /* Take full width for centering */
+    }
+    .nav-title {
+        margin-right: 0;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section h1 {
+        font-size: 28px;
+    }
+    .hero-section p {
+        font-size: 16px;
+    }
+    .hero-button {
+        font-size: 16px;
+        padding: 12px 25px;
+    }
+    .features-section h2 {
+        font-size: 26px;
+    }
+    .feature-card svg {
+        width: 50px;
+        height: 50px;
+    }
+    .feature-card h3 {
+        font-size: 20px;
+    }
+    .cta-section h2 {
+        font-size: 28px;
+    }
+    .cta-section p {
+        font-size: 16px;
+    }
+    .cta-button {
+        font-size: 18px;
+        padding: 12px 25px;
+    }
+}
