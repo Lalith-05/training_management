@@ -1,48 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Reassign User to Manager</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reassign User to Manager - Training Management System</title>
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <script>
+        // This function is included for consistency and potential client-side use
+        function showMessage(type, text) {
+            const container = document.querySelector('.main-content');
+            let messageBox = document.getElementById('client-message-box');
+            let messageText;
+
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'client-message-box';
+                messageBox.className = 'message-box hidden';
+                messageBox.setAttribute('role', 'alert');
+                messageBox.innerHTML = '<strong class="font-bold"></strong> <span class="block sm:inline"></span>';
+                if (container) {
+                    // Prepend to the main content area or specific form card
+                    const formCard = document.querySelector('.login-card');
+                    if (formCard) {
+                        formCard.prepend(messageBox);
+                    } else {
+                        container.prepend(messageBox);
+                    }
+                } else {
+                    document.body.prepend(messageBox);
+                }
+            }
+
+            messageText = messageBox.querySelector('span');
+            const messageStrong = messageBox.querySelector('strong');
+
+            messageText.textContent = text;
+            messageBox.className = `message-box`;
+            if (type === 'error') {
+                messageBox.classList.add('error');
+                messageStrong.textContent = 'Error!';
+            } else if (type === 'success') {
+                messageBox.classList.add('success');
+                messageStrong.textContent = 'Success!';
+            } else {
+                messageBox.classList.add('info');
+                messageStrong.textContent = 'Info!';
+            }
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Embed Flask data into JavaScript for dynamic search
+            // Ensure that if 'users' or 'managers' is empty, an empty JSON array string '[]' is used.
+            const allUsers = JSON.parse('{{ users | tojson | safe or "[]" }}');
+            const allManagers = JSON.parse('{{ managers | tojson | safe or "[]" }}');
+
+            // Function to set up dynamic search for users/managers
+            function setupSearchableList(searchInputId, suggestionsContainerId, hiddenInputId, data) {
+                const searchInput = document.getElementById(searchInputId);
+                const suggestionsContainer = document.getElementById(suggestionsContainerId);
+                const hiddenInput = document.getElementById(hiddenInputId);
+
+                // Hide suggestions if clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!suggestionsContainer.contains(event.target) && event.target !== searchInput) {
+                        suggestionsContainer.classList.add('hidden');
+                    }
+                });
+
+                searchInput.addEventListener('input', function() {
+                    const filter = searchInput.value.toLowerCase();
+                    suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                    suggestionsContainer.classList.remove('hidden'); // Show container
+
+                    if (filter.length === 0) {
+                        suggestionsContainer.classList.add('hidden'); // Hide if search is empty
+                        hiddenInput.value = ''; // Clear hidden input if search is cleared
+                        return;
+                    }
+
+                    const filteredData = data.filter(item =>
+                        item.username.toLowerCase().includes(filter) ||
+                        (item.id && String(item.id).toLowerCase().includes(filter))
+                    );
+
+                    if (filteredData.length === 0) {
+                        suggestionsContainer.classList.add('hidden'); // Hide if no results
+                        return;
+                    }
+
+                    filteredData.forEach(item => {
+                        const suggestionItem = document.createElement('div');
+                        suggestionItem.classList.add('autocomplete-result-item');
+                        suggestionItem.textContent = `${item.username} (ID: ${item.id})`;
+                        suggestionItem.dataset.id = item.id; // Store ID in dataset
+
+                        suggestionItem.addEventListener('click', function() {
+                            searchInput.value = `${item.username} (ID: ${item.id})`;
+                            hiddenInput.value = item.id; // Set the hidden input value
+                            suggestionsContainer.classList.add('hidden'); // Hide suggestions
+                        });
+                        suggestionsContainer.appendChild(suggestionItem);
+                    });
+                });
+            }
+
+            // Initialize search for users and managers
+            setupSearchableList('user-search', 'user-suggestions', 'hidden_user_id', allUsers);
+            setupSearchableList('manager-search', 'manager-suggestions', 'hidden_manager_id', allManagers);
+
+            // Client-side form validation to ensure a user/manager is selected
+            const reassignForm = document.getElementById('reassignForm');
+            if (reassignForm) {
+                reassignForm.addEventListener('submit', function(event) {
+                    if (!document.getElementById('hidden_user_id').value) {
+                        event.preventDefault();
+                        showMessage('error', 'Please select a user from the suggestions.');
+                    }
+                    if (!document.getElementById('hidden_manager_id').value) {
+                        event.preventDefault();
+                        showMessage('error', 'Please select a new manager from the suggestions.');
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 <body>
-  <h2>Admin: Reassign User to a Different Manager</h2>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-  <form method="POST" action="/admin/reassign_user">
-    <label for="user_id">Select User:</label>
-    <select name="user_id" required>
-      <option value="">-- Select a User --</option>
-      {% for user in users %}
-        <option value="{{ user.id }}">{{ user.username }} (ID: {{ user.id }})</option>
-      {% endfor %}
-    </select>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="login-card"> <!-- Using login-card for consistent form container styling -->
+            <h2 class="login-heading">Admin: Reassign User to a Different Manager</h2>
 
-    <br><br>
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-    <label for="manager_id">Select New Manager:</label>
-    <select name="manager_id" required>
-      <option value="">-- Select a Manager --</option>
-      {% for manager in managers %}
-        <option value="{{ manager.id }}">{{ manager.username }} (ID: {{ manager.id }})</option>
-      {% endfor %}
-    </select>
+            <form method="POST" action="/admin/reassign_user" id="reassignForm" class="space-y-6">
+                <div class="form-group">
+                    <label for="user-search" class="form-label">Search and Select User:</label>
+                    <input type="text" id="user-search" placeholder="Type to search users..." class="form-input autocomplete-input" autocomplete="off">
+                    <div id="user-suggestions" class="autocomplete-results hidden"></div>
+                    <!-- Hidden input to store the selected user's ID -->
+                    <input type="hidden" name="user_id" id="hidden_user_id" required>
+                </div>
 
-    <br><br>
+                <div class="form-group">
+                    <label for="manager-search" class="form-label">Search and Select New Manager:</label>
+                    <input type="text" id="manager-search" placeholder="Type to search managers..." class="form-input autocomplete-input" autocomplete="off">
+                    <div id="manager-suggestions" class="autocomplete-results hidden"></div>
+                    <!-- Hidden input to store the selected manager's ID -->
+                    <input type="hidden" name="manager_id" id="hidden_manager_id" required>
+                </div>
 
-    <button type="submit">Reassign User</button>
-  </form>
+                <button type="submit" class="submit-button">Reassign User</button>
+            </form>
 
-  <br>
-  <a href="/dashboard">← Back to Dashboard</a>
+            <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        </div>
+    </main>
+
 </body>
 </html>

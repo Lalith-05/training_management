@@ -1,100 +1,180 @@
-<!-- templates/approve_courses.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Approve Course Requests</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    .request-box {
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-    }
-    .request-box.rejected {
-      background-color: #ffe6e6;
-      border-left: 5px solid red;
-    }
-    textarea {
-      width: 100%;
-      margin-top: 10px;
-    }
-    button {
-      margin-right: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Course Requests - Training Management System</title>
+    <!-- Google Fonts - Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <script>
+        // Function for displaying client-side messages (replaces alert())
+        function showMessage(type, text) {
+            const container = document.querySelector('.dashboard-card'); // Or adjust where you want it
+            let messageBox = document.getElementById('client-message-box');
+            let messageText;
+
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'client-message-box';
+                messageBox.className = 'message-box hidden';
+                messageBox.setAttribute('role', 'alert');
+                messageBox.innerHTML = '<strong class="font-bold"></strong> <span class="block sm:inline"></span>';
+                if (container) {
+                    const heading = container.querySelector('.dashboard-heading');
+                    if (heading) {
+                        heading.after(messageBox);
+                    } else {
+                        container.prepend(messageBox);
+                    }
+                } else {
+                    document.body.prepend(messageBox);
+                }
+            }
+
+            messageText = messageBox.querySelector('span');
+            const messageStrong = messageBox.querySelector('strong');
+
+            messageText.textContent = text;
+            messageBox.className = `message-box`;
+            if (type === 'error') {
+                messageBox.classList.add('error');
+                messageStrong.textContent = 'Error!';
+            } else if (type === 'success') {
+                messageBox.classList.add('success');
+                messageStrong.textContent = 'Success!';
+            } else {
+                messageBox.classList.add('info');
+                messageStrong.textContent = 'Info!';
+            }
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Confirm rejection reason is filled using the custom showMessage
+            window.confirmReject = function(form) {
+                const reasonInput = form.querySelector('textarea[name="reason"]');
+                const reason = reasonInput ? reasonInput.value.trim() : '';
+
+                if (!reason) {
+                    showMessage('error', 'Please enter a reason for rejection.');
+                    return false;
+                }
+                return true;
+            };
+
+            // Prevent double submission and indicate loading
+            window.handleSubmit = function(form) {
+                const buttons = form.querySelectorAll("button[type='submit']");
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.textContent = 'Processing...'; // Change button text
+                    btn.style.opacity = '0.7'; // Dim button
+                    btn.style.cursor = 'wait'; // Change cursor
+                });
+                return true;
+            };
+
+            // Add an event listener to each form's reject button
+            // to ensure confirmReject is called before handleSubmit for reject action
+            document.querySelectorAll('form').forEach(form => {
+                const rejectButton = form.querySelector('button[name="action"][value="reject"]');
+                if (rejectButton) {
+                    rejectButton.addEventListener('click', function(event) {
+                        // Only proceed if confirmReject returns true
+                        if (!confirmReject(form)) {
+                            event.preventDefault(); // Stop form submission
+                        } else {
+                            // If reason is present, then call handleSubmit
+                            handleSubmit(form);
+                        }
+                    });
+                }
+
+                // Add handleSubmit to all submit buttons, but only after confirmReject for reject button
+                const approveButton = form.querySelector('button[name="action"][value="approve"]');
+                if (approveButton) {
+                    approveButton.addEventListener('click', function(event) {
+                        // For approve button, just call handleSubmit directly
+                        handleSubmit(form);
+                    });
+                }
+
+                // Handle the hidden input for the 'action' value
+                form.querySelectorAll('button[type="submit"]').forEach(button => {
+                    button.addEventListener('click', function() {
+                        let hiddenInput = form.querySelector('input[name="action"]');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'action';
+                            form.appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = this.value;
+                    });
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-  <h2>Pending Course Approvals</h2>
 
-  {% if selections %}
-    {% for req in selections %}
-      <div class="request-box">
-        <p><strong>User:</strong> {{ req.username }} ({{ req.email }})</p>
-        <p><strong>Designation:</strong> {{ req.designation }}</p>
-        <p><strong>Course:</strong> {{ req.course_name }} [{{ req.course_type }}] (ID: {{ req.course_id }})</p>
-        <p><strong>Duration:</strong> {{ req.duration }}</p>
-        <p><strong>Description:</strong> {{ req.description }}</p>
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-        <form method="post" action="{{ url_for('selection.handle_request', request_id=req.id) }}">
-          <button type="submit" name="action" value="approve">Approve</button>
-          <button type="submit" name="action" value="reject" onclick="return confirmReject(this.form)">Reject</button>
-          <br><br>
-          <textarea name="reason" placeholder="Reason if rejected..." rows="2"></textarea>
-        </form>
-      </div>
-      <hr>
-    {% endfor %}
-  {% else %}
-    <p>No pending requests.</p>
-  {% endif %}
-  <br>
-  <a href="/dashboard">← Back to Dashboard</a>
-  <script>
-    function confirmReject(form) {
-      const reason = form.reason.value.trim();
-      if (!reason) {
-        alert('Please enter a reason for rejection.');
-        return false;
-      }
-      return true;
-    }
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="dashboard-card wide-card"> <!-- Using dashboard-card for overall container, wider for lists -->
+            <h2 class="dashboard-heading">Pending Course Approvals</h2>
 
-    function handleSubmit(form) {
-      const buttons = form.querySelectorAll("button");
-      buttons.forEach(btn => btn.disabled = true);
-      return true;
-    }
-  </script>
-  <script>
-  // Inject hidden input for which button was clicked (approve or reject)
-  document.querySelectorAll("form").forEach(form => {
-    form.querySelectorAll("button").forEach(button => {
-      button.addEventListener("click", function () {
-        let hiddenInput = form.querySelector("input[name='action']");
-        if (!hiddenInput) {
-          hiddenInput = document.createElement("input");
-          hiddenInput.type = "hidden";
-          hiddenInput.name = "action";
-          form.appendChild(hiddenInput);
-        }
-        hiddenInput.value = this.value;
-      });
-    });
-  });
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-  // Confirm rejection reason is filled
-  function confirmReject(form) {
-    const reason = form.reason.value.trim();
-    if (!reason) {
-      alert('Please enter a reason for rejection.');
-      return false;
-    }
-    return true;
-  }
-</script>
+            {% if selections %}
+                <div class="requests-grid">
+                    {% for req in selections %}
+                        <div class="approval-request-card {% if req.status == 'rejected' %}rejected{% endif %}">
+                            <p><svg class="request-meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><strong>User:</strong> {{ req.username }} ({{ req.email }})</p>
+                            <p><svg class="request-meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.855V19a2 2 0 01-2 2H5a2 2 0 01-2-2V8.577l2-1.5V5a2 2 0 012-2h10a2 2 0 012 2v2.077l2 1.5zm-1-8a2 2 0 00-2-2h-4v7h7l-1-1zm-6 2H8V5h4v2zM12 17a2 2 0 100-4 2 2 0 000 4z"/></svg><strong>Designation:</strong> {{ req.designation }}</p>
+                            <p><svg class="request-meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"/></svg><strong>Course:</strong> {{ req.course_name }} [{{ req.course_type | capitalize }}] (ID: {{ req.course_id }})</p>
+                            <p><svg class="request-meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><strong>Duration:</strong> {{ req.duration }}</p>
+                            <p><svg class="request-meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg><strong>Description:</strong> {{ req.description }}</p>
+
+                            <form method="post" action="{{ url_for('selection.handle_request', request_id=req.id) }}" class="approval-form-actions">
+                                <textarea name="reason" placeholder="Reason for rejection (required if rejecting)..." rows="2" class="form-input"></textarea>
+                                <button type="submit" name="action" value="approve" class="approve-button">Approve</button>
+                                <button type="submit" name="action" value="reject" class="reject-button">Reject</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-courses-message">No pending course approval requests.</p>
+            {% endif %}
+            <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        </div>
+    </main>
 
 </body>
 </html>

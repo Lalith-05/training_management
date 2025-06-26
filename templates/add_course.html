@@ -1,79 +1,83 @@
-<!-- templates/add_course.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Add Course</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    .form-container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      background-color: #f9f9f9;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    input[type="text"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      box-sizing: border-box;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-    }
-
-    a {
-      display: block;
-      margin-top: 15px;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Course - Training Management System</title>
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <h2 style="text-align:center;">Add a New Course</h2>
 
-  <div class="form-container">
-    <form method="POST" action="/course/add_course">
-      <label for="name">Course Name:</label>
-      <input type="text" id="name" name="name" required>
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-      <label for="duration">Duration:</label>
-      <input type="text" id="duration" name="duration" required>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="login-card"> <!-- Using login-card for consistent form container styling -->
+            <h2 class="login-heading">Add a New Course</h2>
 
-      <label for="provider">Training Provider:</label>
-      <input type="text" id="provider" name="provider" required>
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-      <label for="levels">Applicable Levels (e.g. E1,E2):</label>
-      <input type="text" id="levels" name="levels" required>
+            <form method="POST" action="/course/add_course" class="space-y-6">
+                <div class="form-group">
+                    <label for="name" class="form-label">Course Name:</label>
+                    <input type="text" id="name" name="name" required class="form-input">
+                </div>
 
-      <label for="description">Description:</label>
-      <textarea id="description" name="description" rows="4" required></textarea>
+                <div class="form-group">
+                    <label for="duration" class="form-label">Duration (e.g., "3 days", "2 weeks"):</label>
+                    <input type="text" id="duration" name="duration" required class="form-input">
+                </div>
 
-      <label for="course_type">Course Type:</label>
-      <select id="course_type" name="course_type" required>
-        <option value="">-- Select Type --</option>
-        <option value="technical">Technical</option>
-        <option value="general">General</option>
-        <option value="certificate">Certificate</option>
-        <option value="quality">Quality</option>
-      </select>
+                <div class="form-group">
+                    <label for="provider" class="form-label">Training Provider:</label>
+                    <input type="text" id="provider" name="provider" required class="form-input">
+                </div>
 
-      <button type="submit">Add Course</button>
-    </form>
+                <div class="form-group">
+                    <label for="levels" class="form-label">Applicable Levels (e.g., E1,E2,E3):</label>
+                    <input type="text" id="levels" name="levels" required class="form-input" placeholder="Comma-separated values">
+                </div>
 
-    <a href="/dashboard">← Back to Dashboard</a>
-  </div>
+                <div class="form-group">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea id="description" name="description" rows="4" required class="form-input"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="course_type" class="form-label">Course Type:</label>
+                    <select id="course_type" name="course_type" required class="form-input">
+                        <option value="">-- Select Type --</option>
+                        <option value="technical">Technical</option>
+                        <option value="general">General</option>
+                        <option value="certificate">Certificate</option>
+                        <option value="quality">Quality</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-button">Add Course</button>
+            </form>
+
+            <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        </div>
+    </main>
+
 </body>
 </html>

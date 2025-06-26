@@ -1,24 +1,43 @@
-<!-- templates/admin_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Training Management System</title>
+    <!-- Google Fonts - Inter for modern typography -->
+    <!-- Link to your custom stylesheet -->
     <link rel="stylesheet" href="/static/css/style.css">
-    
 </head>
 <body>
-    <h2>Welcome, Admin {{ username }}</h2>
 
-    <ul>
-        <li><a href="/admin/user_manager_map">User-Manager Mapping</a></li>
-        <li><a href="/admin/reassign_user">Reassign Users</a></li>
-        <li><a href="/course/add_course">Add Course</a></li>
-        <li><a href="/course/view_courses">View All Courses</a></li>
-        <li><a href="/course/delete_course">Delete Courses</li>
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-    </ul>
+    <!-- Admin Dashboard Content Section -->
+    <main class="main-content">
+        <div class="dashboard-card"> <!-- New container for dashboard content, styled similarly to login-card -->
+            <h2 class="dashboard-heading">Welcome, Admin {{ username }}</h2>
 
-    <a href="/logout">Logout</a>
+            <nav>
+                <ul class="dashboard-links">
+                    <li class="dashboard-link-item"><a href="/admin/user_manager_map">User-Manager Mapping</a></li>
+                    <li class="dashboard-link-item"><a href="/admin/reassign_user">Reassign Users</a></li>
+                    <li class="dashboard-link-item"><a href="/course/add_course">Add Course</a></li>
+                    <li class="dashboard-link-item"><a href="/course/view_courses">View All Courses</a></li>
+                    <li class="dashboard-link-item"><a href="/course/delete_course">Delete Courses</a></li>
+                    <!-- Add more admin specific links as needed -->
+                </ul>
+            </nav>
+
+            <a href="/logout" class="logout-button">Logout</a>
+        </div>
+    </main>
+
 </body>
 </html>

@@ -1,104 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Available Courses</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    .course {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      background-color: #f9f9f9;
-      max-width: 800px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Courses - Training Management System</title>
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <script>
+        // Function for displaying client-side messages
+        function showMessage(type, text) {
+            const container = document.querySelector('.main-content');
+            let messageBox = document.getElementById('client-message-box');
+            let messageText;
 
-    form {
-      margin-top: 10px;
-    }
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'client-message-box';
+                messageBox.className = 'message-box hidden';
+                messageBox.setAttribute('role', 'alert');
+                messageBox.innerHTML = '<strong class="font-bold"></strong> <span class="block sm:inline"></span>';
+                const formCard = document.querySelector('.course-catalog-card');
+                if (formCard) {
+                    formCard.prepend(messageBox);
+                } else if (container) {
+                    container.prepend(messageBox);
+                } else {
+                    document.body.prepend(messageBox);
+                }
+            }
 
-    .filter-form {
-      margin-bottom: 30px;
-    }
+            messageText = messageBox.querySelector('span');
+            const messageStrong = messageBox.querySelector('strong');
 
-    .filter-form label {
-      font-weight: bold;
-    }
+            messageText.textContent = text;
+            messageBox.className = `message-box`;
+            if (type === 'error') {
+                messageBox.classList.add('error');
+                messageStrong.textContent = 'Error!';
+            } else if (type === 'success') {
+                messageBox.classList.add('success');
+                messageStrong.textContent = 'Success!';
+            } else {
+                messageBox.classList.add('info');
+                messageStrong.textContent = 'Info!';
+            }
+            messageBox.classList.remove('hidden');
 
-    .filter-form select {
-      padding: 5px;
-    }
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
 
-    h2 {
-      text-align: center;
-    }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Embed Flask data for courses and selected type
+            const allCourses = JSON.parse('{{ courses | tojson | safe or "[]" }}');
+            const selectedType = '{{ selected_type | default("") }}'; // Get the initial filter from Flask
 
-    .flashes {
-      max-width: 800px;
-      margin: 0 auto 20px;
-      padding: 10px;
-      border-radius: 8px;
-      background-color: #fff4e5;
-      border: 1px solid #ffc107;
-      color: #856404;
-      font-weight: bold;
-    }
-  </style>
+            const coursesPerPage = 6; // Number of courses to display per page
+            let currentPage = 1;
+            let currentFilteredCourses = []; // Stores courses after search and initial filter
+
+            const courseGrid = document.getElementById('course-grid');
+            const paginationControls = document.getElementById('pagination-controls');
+            const courseSearchInput = document.getElementById('course-search');
+            const courseTypeSelect = document.getElementById('type');
+            const noCoursesMessage = document.getElementById('no-courses-message');
+
+            // Function to filter courses based on search and selected type
+            function filterAndDisplayCourses() {
+                const searchTerm = courseSearchInput.value.toLowerCase();
+                const currentSelectedType = courseTypeSelect.value;
+
+                currentFilteredCourses = allCourses.filter(course => {
+                    const matchesSearch = course.name.toLowerCase().includes(searchTerm) ||
+                                          course.description.toLowerCase().includes(searchTerm) ||
+                                          course.training_provider.toLowerCase().includes(searchTerm) ||
+                                          String(course.course_id).toLowerCase().includes(searchTerm);
+
+                    const matchesType = (currentSelectedType === '' || course.course_type.toLowerCase() === currentSelectedType);
+
+                    return matchesSearch && matchesType;
+                });
+
+                currentPage = 1; // Reset to first page after filter/search
+                renderCourses();
+                renderPaginationControls();
+
+                if (currentFilteredCourses.length === 0) {
+                    noCoursesMessage.classList.remove('hidden');
+                } else {
+                    noCoursesMessage.classList.add('hidden');
+                }
+            }
+
+            // Function to render courses for the current page
+            function renderCourses() {
+                courseGrid.innerHTML = ''; // Clear existing courses
+                const startIndex = (currentPage - 1) * coursesPerPage;
+                const endIndex = startIndex + coursesPerPage;
+                const coursesToDisplay = currentFilteredCourses.slice(startIndex, endIndex);
+
+                if (coursesToDisplay.length === 0 && currentFilteredCourses.length > 0) {
+                     // If on an empty page after filtering but results exist, go to last page
+                     currentPage = Math.ceil(currentFilteredCourses.length / coursesPerPage);
+                     const newStartIndex = (currentPage - 1) * coursesPerPage;
+                     const newEndIndex = newStartIndex + coursesPerPage;
+                     const newCoursesToDisplay = currentFilteredCourses.slice(newStartIndex, newEndIndex);
+                     if (newCoursesToDisplay.length > 0) { // Only render if new page has content
+                         newCoursesToDisplay.forEach(course => courseGrid.appendChild(createCourseCard(course)));
+                     } else { // No courses after all, show message
+                        noCoursesMessage.classList.remove('hidden');
+                     }
+                } else if (coursesToDisplay.length === 0 && currentFilteredCourses.length === 0) {
+                    noCoursesMessage.classList.remove('hidden');
+                }
+                else {
+                    coursesToDisplay.forEach(course => courseGrid.appendChild(createCourseCard(course)));
+                }
+            }
+
+            // Helper function to create a course card HTML element
+            function createCourseCard(course) {
+                const card = document.createElement('div');
+                card.classList.add('course-card');
+
+                card.innerHTML = `
+                    <h3 class="course-title">${course.name}</h3>
+                    <div class="space-y-2 mb-4">
+                        <p class="course-meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4-4m-4 4l-4-4m-4 4l-4-4m-4 4l-4-4"/></svg>
+                            <strong>ID:</strong> ${course.course_id}
+                        </p>
+                        <p class="course-meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <strong>Duration:</strong> ${course.duration}
+                        </p>
+                        <p class="course-meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h10m-2-5h2m-2-3h2M9 11V9m0 2h.01M9 14V9m0 2h.01M19 14h-2"/></svg>
+                            <strong>Provider:</strong> ${course.training_provider}
+                        </p>
+                        <p class="course-meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <strong>Applicable Levels:</strong> ${course.applicable_levels}
+                        </p>
+                    </div>
+                    <p class="course-description">${course.description}</p>
+                    <span class="course-type">${course.course_type}</span>
+                    ${'{{ session.role }}' === 'user' ? `
+                    <form method="post" action="/selection/select_course/${course.course_id}" class="course-select-form">
+                        <button type="submit" class="course-select-button">Select Course</button>
+                    </form>
+                    ` : ''}
+                `;
+                return card;
+            }
+
+            // Function to render pagination controls
+            function renderPaginationControls() {
+                paginationControls.innerHTML = ''; // Clear existing controls
+                const totalPages = Math.ceil(currentFilteredCourses.length / coursesPerPage);
+
+                if (totalPages <= 1 && currentFilteredCourses.length > 0) {
+                    // Don't show pagination if there's only one page of results
+                    return;
+                }
+
+                // Previous button
+                const prevButton = document.createElement('button');
+                prevButton.classList.add('page-button');
+                prevButton.textContent = 'Previous';
+                prevButton.disabled = currentPage === 1;
+                prevButton.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderCourses();
+                        renderPaginationControls();
+                    }
+                });
+                paginationControls.appendChild(prevButton);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.classList.add('page-button');
+                    pageButton.textContent = i;
+                    if (i === currentPage) {
+                        pageButton.classList.add('active');
+                    }
+                    pageButton.addEventListener('click', () => {
+                        currentPage = i;
+                        renderCourses();
+                        renderPaginationControls();
+                    });
+                    paginationControls.appendChild(pageButton);
+                }
+
+                // Next button
+                const nextButton = document.createElement('button');
+                nextButton.classList.add('page-button');
+                nextButton.textContent = 'Next';
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderCourses();
+                        renderPaginationControls();
+                    }
+                });
+                paginationControls.appendChild(nextButton);
+            }
+
+            // Event listeners
+            courseSearchInput.addEventListener('input', filterAndDisplayCourses);
+            courseTypeSelect.addEventListener('change', filterAndDisplayCourses);
+
+            // Initial display of courses and pagination
+            filterAndDisplayCourses(); // Initial filter/search and render
+        });
+    </script>
 </head>
 <body>
-  <h2>Course Catalog</h2>
 
-  <!-- Flash Messages -->
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-  <!-- Filter Form -->
-  <form method="get" action="/course/view_courses" class="filter-form">
-    <label for="type">Filter by Category:</label>
-    <select name="type" id="type">
-      <option value="">All</option>
-      <option value="technical" {% if selected_type == 'technical' %}selected{% endif %}>Technical</option>
-      <option value="general" {% if selected_type == 'general' %}selected{% endif %}>General</option>
-      <option value="certificate" {% if selected_type == 'certificate' %}selected{% endif %}>Certificate</option>
-      <option value="quality" {% if selected_type == 'quality' %}selected{% endif %}>Quality</option>
-    </select>
-    <button type="submit">Filter</button>
-  </form>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="dashboard-card course-catalog-card"> <!-- Using dashboard-card for overall container -->
+            <h2 class="dashboard-heading">Course Catalog</h2>
 
-  <!-- Course List -->
-  {% if courses %}
-    {% for course in courses %}
-      <div class="course">
-        <h3>{{ course.name }}</h3>
-        <p><strong>ID:</strong> {{ course.course_id }}</p>
-        <p><strong>Duration:</strong> {{ course.duration }}</p>
-        <p><strong>Provider:</strong> {{ course.training_provider }}</p>
-        <p><strong>Applicable Levels:</strong> {{ course.applicable_levels }}</p>
-        <p><strong>Description:</strong> {{ course.description }}</p>
-        <p><strong>Type:</strong> {{ course.course_type }}</p>
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        {% if session.role == 'user' %}
-          <form method="post" action="/selection/select_course/{{ course.course_id }}">
-            <button type="submit">Select Course</button>
-          </form>
-        {% endif %}
-        
-        <!-- Manager can only view, no buttons shown -->
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>No courses found for selected category.</p>
-  {% endif %}
+            <!-- Filter and Search Form -->
+            <div class="course-filter-search-group">
+                <div class="form-group">
+                    <label for="course-search" class="form-label">Search Courses:</label>
+                    <input type="text" id="course-search" placeholder="Search by name, ID, provider..." class="form-input">
+                </div>
+                <form method="get" action="/course/view_courses" class="form-group" style="margin-bottom:0;">
+                    <label for="type" class="form-label">Filter by Category:</label>
+                    <select name="type" id="type" class="filter-select">
+                        <option value="">All</option>
+                        <option value="technical" {% if selected_type == 'technical' %}selected{% endif %}>Technical</option>
+                        <option value="general" {% if selected_type == 'general' %}selected{% endif %}>General</option>
+                        <option value="certificate" {% if selected_type == 'certificate' %}selected{% endif %}>Certificate</option>
+                        <option value="quality" {% if selected_type == 'quality' %}selected{% endif %}>Quality</option>
+                    </select>
+                    <button type="submit" class="filter-button">Apply Filter</button>
+                </form>
+            </div>
 
-  <br>
-  <a href="/dashboard">← Back to Dashboard</a>
+            <!-- Course List Grid -->
+            <div id="course-grid" class="course-grid">
+                <!-- Course cards will be dynamically inserted here by JavaScript -->
+            </div>
+
+            <!-- No Courses Found Message -->
+            <p id="no-courses-message" class="no-courses-message hidden">No courses found matching your criteria.</p>
+
+            <!-- Pagination Controls -->
+            <div id="pagination-controls" class="pagination-controls">
+                <!-- Pagination buttons will be dynamically inserted here by JavaScript -->
+            </div>
+
+            <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        </div>
+    </main>
+
 </body>
 </html>

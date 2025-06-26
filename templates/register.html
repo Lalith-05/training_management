@@ -1,66 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User Registration</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <script defer src="/static/js/validate.js"></script> <!-- Use relative path -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration - Training Management System</title>
+    <!-- Google Fonts - Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link to your custom stylesheet (style.css from the previous iteration) -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Defer loading of client-side validation script -->
+    <script src="/static/js/validate.js"></script>
 </head>
 <body>
-  <h2>Register New Account</h2>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+    <!-- Top Navigation Bar - Consistent with Login Page -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-  <form action="/register" method="POST" id="registerForm">
-    <label>Username (8–15 chars):</label>
-    <input type="text" name="username" required minlength="8" maxlength="15">
+    <!-- Registration Form Section -->
+    <main class="main-content">
+        <div class="login-card"> <!-- Reusing login-card for consistent styling of form container -->
+            <h2 class="login-heading">Register New Account</h2>
 
-    <label>Staff Number:</label>
-    <input type="text" name="staff_no" required>
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <!-- The 'message-box' class and its type-specific classes (error, success, info)
+                             are defined in style.css to match the modern alert styling. -->
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-    <label>Email:</label>
-    <input type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+            <form action="/register" method="POST" id="registerForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username (8–15 chars):</label>
+                    <input type="text" id="username" name="username" required minlength="8" maxlength="15" class="form-input">
+                </div>
 
-    <label>Department:</label>
-    <input type="text" name="department" required>
+                <div class="form-group">
+                    <label for="staff_no" class="form-label">Staff Number:</label>
+                    <input type="text" id="staff_no" name="staff_no" required class="form-input">
+                </div>
 
-    <label>Designation:</label>
-    <select name="designation" required>
-      <option value="">Select</option>
-      <!-- Users -->
-      <option value="E1">E1</option>
-      <option value="E2">E2</option>
-      <option value="E3">E3</option>
-      <option value="E4">E4</option>
-      <option value="E5">E5</option>
-      <option value="E6">E6</option>
-      <!-- Managers -->
-      <option value="E7">E7</option>
-      <option value="E8">E8</option>
-      <option value="E9">E9</option>
-      <option value="E10">E10</option>
-      <option value="E11">E11</option>
-    </select>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" class="form-input">
+                </div>
 
-    <label>Password (min 8 chars, 1 upper, 1 lower, 1 number):</label>
-    <input type="password" name="password" required
-           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                <div class="form-group">
+                    <label for="department" class="form-label">Department:</label>
+                    <input type="text" id="department" name="department" required class="form-input">
+                </div>
 
-    <label>Confirm Password:</label>
-    <input type="password" name="confirm_password" required>
+                <div class="form-group">
+                    <label for="designation" class="form-label">Designation:</label>
+                    <select id="designation" name="designation" required class="form-input">
+                        <option value="">Select</option>
+                        <!-- Users -->
+                        <option value="E1">E1</option>
+                        <option value="E2">E2</option>
+                        <option value="E3">E3</option>
+                        <option value="E4">E4</option>
+                        <option value="E5">E5</option>
+                        <option value="E6">E6</option>
+                        <!-- Managers -->
+                        <option value="E7">E7</option>
+                        <option value="E8">E8</option>
+                        <option value="E9">E9</option>
+                        <option value="E10">E10</option>
+                        <option value="E11">E11</option>
+                    </select>
+                </div>
 
-    <button type="submit">Register</button>
-  </form>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password (min 8 chars, 1 upper, 1 lower, 1 number):</label>
+                    <input type="password" id="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" class="form-input">
+                </div>
 
-  <p>Already have an account? <a href="/login">Login here</a></p>
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required class="form-input">
+                </div>
+
+                <button type="submit" class="submit-button">Register</button>
+            </form>
+
+            <p class="register-text">Already have an account? <a href="/login" class="register-link">Login here</a></p>
+        </div>
+    </main>
+
+    <!--
+        The showMessage JavaScript function from the login page is not directly used here
+        since Flask's flashed messages are handled directly in the HTML template.
+        However, if you wish to use it for client-side validation messages, you can
+        integrate it with your validate.js script.
+    -->
+    <script>
+        // Placeholder for potential client-side message display, if not using Flask's flash messages
+        // or for immediate feedback before server roundtrip.
+        // This function is present for consistency with the login page.
+        function showMessage(type, text) {
+            const formContainer = document.querySelector('.login-card');
+            let messageBox = document.getElementById('client-message-box'); // Using a different ID for client-side messages
+            let messageText;
+
+            if (!messageBox) {
+                // Create message box if it doesn't exist
+                messageBox = document.createElement('div');
+                messageBox.id = 'client-message-box';
+                messageBox.className = 'message-box hidden';
+                messageBox.setAttribute('role', 'alert');
+                messageBox.innerHTML = '<strong class="font-bold"></strong> <span class="block sm:inline"></span>';
+                // Insert right after the h2 heading in the form card
+                const heading = formContainer.querySelector('.login-heading');
+                if (heading) {
+                    heading.after(messageBox);
+                } else {
+                    formContainer.prepend(messageBox); // Fallback if no heading
+                }
+            }
+
+            messageText = messageBox.querySelector('span');
+            const messageStrong = messageBox.querySelector('strong');
+
+            messageText.textContent = text;
+            messageBox.className = `message-box`; // Keep base class
+            if (type === 'error') {
+                messageBox.classList.add('error');
+                messageStrong.textContent = 'Error!';
+            } else if (type === 'success') {
+                messageBox.classList.add('success');
+                messageStrong.textContent = 'Success!';
+            } else { // Default to info/blue if type is not error or success
+                messageBox.classList.add('info');
+                messageStrong.textContent = 'Info!';
+            }
+            messageBox.classList.remove('hidden');
+
+            // Auto-hide after 5 seconds (optional)
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Example client-side validation (to be integrated with validate.js or here)
+        // const registerForm = document.getElementById('registerForm');
+        // if (registerForm) {
+        //     registerForm.addEventListener('submit', function(event) {
+        //         const password = document.getElementById('password').value;
+        //         const confirmPassword = document.getElementById('confirm_password').value;
+        //         if (password !== confirmPassword) {
+        //             event.preventDefault(); // Stop form submission
+        //             showMessage('error', 'Passwords do not match.');
+        //         }
+        //         // Add other client-side checks here
+        //     });
+        // }
+    </script>
+
 </body>
 </html>
-

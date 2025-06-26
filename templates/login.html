@@ -1,117 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f4f8;
-    }
-
-    nav {
-      background-color: #0077b6;
-      padding: 16px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: white;
-    }
-
-    nav .nav-title {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 90vh;
-    }
-
-    .login-form {
-      background-color: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .login-form label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-    }
-
-    .login-form input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background-color: #eaf2ff;
-    }
-
-    .login-form button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background-color: #0077b6;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .login-form button:hover {
-      background-color: #005b8a;
-    }
-
-    .login-form p {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .login-form a {
-      color: #0077b6;
-      text-decoration: none;
-    }
-
-    .login-form a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login - Training Management System</title>
+    <!-- Google Fonts - Inter for modern typography -->
+    <!-- Link to your new custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <nav>
-    <div class="nav-title">Training Management System</div>
-    <!-- Optional nav links -->
-    <!-- <div><a href="/home" style="color:white;">Home</a></div> -->
-  </nav>
+    <!-- Top Navigation Bar -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links - uncomment and style if needed
+            <div><a href="/home" class="nav-link">Home</a></div>
+            -->
+        </nav>
+    </header>
 
-  <!-- Login Form Section -->
-  <div class="container">
-    <form class="login-form" action="/login" method="POST">
-      <h2 style="text-align: center; margin-bottom: 20px;">User Login</h2>
+    <!-- Login Form Section -->
+    <main class="main-content">
+        <div class="login-card">
+            <h2 class="login-heading">User Login</h2>
 
-      <label for="staff_no">Staff Number:</label>
-      <input type="text" id="staff_no" name="staff_no" required>
+            <!-- Message/Alert Box - Hidden by default -->
+            <div id="message-box" class="message-box hidden" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span id="message-text" class="block sm:inline">Something went wrong.</span>
+            </div>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
+            <form action="/login" method="POST" class="space-y-6">
+                <div class="form-group">
+                    <label for="staff_no" class="form-label">Staff Number:</label>
+                    <input type="text" id="staff_no" name="staff_no" required class="form-input">
+                </div>
 
-      <button type="submit">Login</button>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" name="password" required class="form-input">
+                </div>
 
-      <p>Don't have an account? <a href="/register">Register here</a></p>
-    </form>
-  </div>
+                <button type="submit" class="submit-button">Login</button>
+
+                <p class="register-text">
+                    Don't have an account? <a href="/register" class="register-link">Register here</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // JavaScript for displaying messages (e.g., from server-side validation)
+        // You would typically populate this based on a server response or client-side validation
+        function showMessage(type, text) {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+
+            if (messageBox && messageText) {
+                messageText.textContent = text;
+                // Reset classes and add specific type class
+                messageBox.className = `message-box`; // Keep base class
+                if (type === 'error') {
+                    messageBox.classList.add('error');
+                } else if (type === 'success') {
+                    messageBox.classList.add('success');
+                } else { // Default to info/blue if type is not error or success
+                    messageBox.classList.add('info');
+                }
+                messageBox.classList.remove('hidden');
+
+                // Auto-hide after 5 seconds (optional)
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Example usage (you would call this with actual messages)
+        // To show an error: showMessage('error', 'Invalid staff number or password. Please try again.');
+        // To show success: showMessage('success', 'Login successful! Redirecting...');
+        // To show info: showMessage('info', 'Please enter your credentials.');
+    </script>
 
 </body>
 </html>

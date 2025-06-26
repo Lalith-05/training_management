@@ -1,127 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User-Manager Assignment Map</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User-Manager Assignment Map - Training Management System</title>
+    <!-- Link to your custom stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Optional: Add a script for client-side message display if needed -->
+    <script>
+        // This function is included for consistency and potential client-side use
+        function showMessage(type, text) {
+            const container = document.querySelector('.main-content'); // Adjust based on where you want the message to appear
+            let messageBox = document.getElementById('client-message-box');
+            let messageText;
 
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'client-message-box';
+                messageBox.className = 'message-box hidden';
+                messageBox.setAttribute('role', 'alert');
+                messageBox.innerHTML = '<strong class="font-bold"></strong> <span class="block sm:inline"></span>';
+                if (container) {
+                    container.prepend(messageBox);
+                } else {
+                    document.body.prepend(messageBox); // Fallback
+                }
+            }
 
-    .manager-block {
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 800px;
-    }
+            messageText = messageBox.querySelector('span');
+            const messageStrong = messageBox.querySelector('strong');
 
-    .manager-header {
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
+            messageText.textContent = text;
+            messageBox.className = `message-box`;
+            if (type === 'error') {
+                messageBox.classList.add('error');
+                messageStrong.textContent = 'Error!';
+            } else if (type === 'success') {
+                messageBox.classList.add('success');
+                messageStrong.textContent = 'Success!';
+            } else {
+                messageBox.classList.add('info');
+                messageStrong.textContent = 'Info!';
+            }
+            messageBox.classList.remove('hidden');
 
-    .manager-header h3 {
-      margin: 0;
-      color: #34495e;
-    }
-
-    ul.user-list {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .user-list li {
-      background-color: #f8f9fa;
-      padding: 10px 15px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      border-left: 5px solid #3498db;
-    }
-
-    .user-list li:last-child {
-      margin-bottom: 0;
-    }
-
-    .no-users {
-      color: #999;
-      font-style: italic;
-    }
-
-    a {
-      display: block;
-      margin-top: 30px;
-      text-align: center;
-      color: #3498db;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .flashes {
-      list-style-type: none;
-      padding: 10px;
-      margin: 20px auto;
-      max-width: 600px;
-      background-color: #fff3cd;
-      border: 1px solid #ffeeba;
-      color: #856404;
-      border-radius: 8px;
-    }
-
-    .flashes li {
-      margin: 5px 0;
-    }
-  </style>
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
 </head>
 <body>
-  <h2>Admin: User-Manager Assignment Overview</h2>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+    <!-- Top Navigation Bar - Consistent with other pages -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-title">Training Management System</div>
+            <!-- Optional nav links -->
+            <!-- <div><a href="/home" class="nav-link">Home</a></div> -->
+        </nav>
+    </header>
 
-  {% for manager in managers %}
-    <div class="manager-block">
-      <div class="manager-header">
-        <h3>👨‍💼 {{ manager.username }} ({{ manager.designation }})</h3>
-      </div>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="dashboard-card wide-card"> <!-- Using dashboard-card for overall container, with wider max-width -->
+            <h2 class="dashboard-heading">Admin: User-Manager Assignment Overview</h2>
 
-      {% if manager.users %}
-        <ul class="user-list">
-          {% for user in manager.users %}
-            <li>
-              👤 {{ user.username }} — <strong>{{ user.designation }}</strong> (Staff No: {{ user.staff_no }})
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="no-users">No users assigned to this manager.</p>
-      {% endif %}
-    </div>
-  {% endfor %}
+            <!-- Flashed Messages Integration (from Flask backend) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}info{% endif %}" role="alert">
+                            <strong class="font-bold">{{ category.capitalize() }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-  <a href="/dashboard">← Back to Dashboard</a>
+            <div class="managers-grid">
+                {% for manager in managers %}
+                    <div class="manager-block">
+                        <div class="manager-header-content">
+                            <span class="manager-icon"></span>
+                            <h3 class="manager-name">{{ manager.username }}</h3>
+                            <span class="manager-designation">({{ manager.designation }})</span>
+                        </div>
+
+                        {% if manager.users %}
+                            <ul class="user-list">
+                                {% for user in manager.users %}
+                                    <li class="user-list-item">
+                                        <span class="user-icon"></span>
+                                        <span class="user-info">{{ user.username }} — <strong>{{ user.designation }}</strong> (Staff No: {{ user.staff_no }})</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="no-users-message">No users assigned to this manager.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+        </div>
+    </main>
+
 </body>
 </html>
